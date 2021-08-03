@@ -2,7 +2,11 @@
 
 [WIP] Reinforcement learning experiments (Dyna-Q+) using game theory (network routing games). A rather straight-forward/simple directed graph is used to assess the performance.
 
-![Simple directed weighted graph used during unit testing.](graph.png)
+![Simple directed weighted graph used during unit testing.](assets/graph.png)
+
+### [WIP] UML
+
+![UML diagram of DynaPlanning.](assets/uml.svg)
 
 ### Dependencies
 
