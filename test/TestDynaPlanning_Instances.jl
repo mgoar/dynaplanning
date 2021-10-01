@@ -44,11 +44,6 @@ for i = 1:length(sources)
     c_e[i] = x -> a_e[i] * x + b_e[i]
 end
 
-locs_x, locs_y = spring_layout(Pigou)
-
-@info("Plotting Pigous's example (G)")
-DynaUtils.plot_graph(Pigou, locs_x, locs_y)
-
 ################################################################################
 # # Create SimpleWeightedDiGraph from a Barabási–Albert model random graph
 
@@ -64,7 +59,7 @@ b_e_G = rand!(rng, zeros(12))
 
 locs_x, locs_y = spring_layout(G)
 
-@info("Plotting network (G)")
+@info("Plotting Barabási–Albert network (G)")
 DynaUtils.plot_graph(G, locs_x, locs_y)
 
 # DynaAgents

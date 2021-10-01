@@ -139,58 +139,6 @@ function find_all_paths(G, src, dst)
 
 end
 
-# """
-#     min_cost_flow(SInstance)
-
-# Compute the minimum-cost flow for `SInstance` using LP.
-
-# """
-# function min_cost_flow(SInstance)
-
-#     # edges and capacity
-#     edgs = collect(edges(SInstance.network))
-
-#     # to Dict()
-#     c_dict = Dict()
-#     u_dict = Dict()
-#     edges_tuple = Array{Tuple{Int64,Int64},1}()
-
-#     for i in collect(1:ne(SInstance.network))
-#         c_dict[(edgs[i].src, edgs[i].dst)] = edgs[i].weight
-#         u_dict[(edgs[i].src, edgs[i].dst)] = 1.0
-#         push!(edges_tuple, (edgs[i].src, edgs[i].dst))
-#     end
-
-#     # supply / demand
-#     b = find_supply_demand(SInstance)
-
-#     nodes = collect(1:nv(SInstance.network))
-
-#     min_costf = Model(GLPK.Optimizer)
-
-#     @variable(min_costf, 0 <= x[e in edges_tuple] <= u_dict[e])
-
-#     @objective(min_costf, Min, sum(c_dict[e] * x[e] for e in edges_tuple))
-
-#     for i in nodes
-#         @constraint(
-#             min_costf,
-#             sum(x[(ii, j)] for (ii, j) in edges_tuple if ii == i) -
-#             sum(x[(j, ii)] for (j, ii) in edges_tuple if ii == i) == b[i]
-#         )
-#     end
-
-#     status = optimize!(min_costf)
-
-#     obj = objective_value(min_costf)
-
-#     x_star = value.(x)
-
-#     return x_star
-
-# end
-
-
 function plot_graph(G, locs_x, locs_y)
 
     A = adjacency_matrix(G)
