@@ -11,6 +11,9 @@ using Setfield
 using LinearAlgebra
 using JuMP, GLPK
 using Logging
+using .Threads
+using Actors
+import Actors: spawn
 
 abstract type AbstractStrategy end
 
@@ -20,15 +23,41 @@ abstract type AbstractAgent end
 
 ################################################################################
 
+mutable struct DynaTuple
+    e::LightGraphs.SimpleGraphs.SimpleEdge{Int64}
+    strategy::AbstractStrategy
+    s::LightGraphs.SimpleGraphs.SimpleEdge{Int64}
+end
+
+mutable struct DictSrv{L}
+    lk::L
+end
+
+(ds::DictSrv)(f::Function, args...) = call(ds.lk, f, args...)
+
+# Indexing interface
+Base.getindex(d::DictSrv, key) = call(d.lk, getindex, key)
+Base.setindex!(d::DictSrv, value, key) = call(d.lk, setindex!, value, key)
+
+# Behavior
+ds(d::Dict, f::Function, args...) = f(d, args...)
+
+# Start dictsrv
+dictsrv(d::Dict; remote = false) = DictSrv(spawn(ds, d; remote))
+
+export DictSrv, dictsrv
+
 mutable struct EnvironmentModel
-    model::Array{
-        Pair{
-            Tuple{LightGraphs.SimpleGraphs.SimpleEdge{Int64},AbstractStrategy},
-            Tuple{Int64,LightGraphs.SimpleGraphs.SimpleEdge{Int64}},
-        },
-        1,
-    }
-    EnvironmentModel() = (x = new())
+    model::DictSrv
+    EnvironmentModel() = (x = new(); x.model = dictsrv(Dict{DynaTuple,Int}()))
+
+    function Base.isequal(A::DynaTuple, B::DynaTuple)
+        A.e == B.e && A.strategy == B.strategy && A.s == B.s
+    end
+
+    function Base.hash(A::DynaTuple)
+        hash(A.e + A.strategy + A.s)
+    end
 end
 
 mutable struct StackelbergStrategy <: AbstractStrategy
@@ -49,8 +78,8 @@ end
 
 mutable struct Q
     q::Array{
-        Pair{Tuple{LightGraphs.SimpleGraphs.SimpleEdge{Int64},AbstractStrategy},Float64},
-        1,
+        Pair{LightGraphs.SimpleGraphs.SimpleEdge{Int64},AbstractStrategy},
+        Pair{LightGraphs.SimpleGraphs.SimpleEdge{Int64},Float64},
     }
     Q() = (x = new())
 end
@@ -78,6 +107,39 @@ mutable struct DynaAgentPlus <: AbstractAgent
     strategy::AbstractStrategy
     time::Int64
     DynaAgentPlus() = (x = new())
+
+    function chooseAction(a)
+
+        max_reward = -9999
+        # ϵ-greedy
+        if rand(Float64, 1) <= ϵ
+            # randomly choose action
+            action = a[rand(1:end)]
+        else
+            # greedy action
+            current_state = state
+            if length(Set(q)) == 1
+                action = rand(actions)
+            else
+                for a in actions
+                    this_reward = q[current_state][a]
+                    if this_reward >= max_reward
+                        action = a
+                        max_reward = this_reward
+                    end
+                end
+            end
+        end
+
+        return action
+
+    end
+
+    function learn()
+
+
+
+    end
 end
 
 mutable struct StackelbergInstance <: AbstractInstance

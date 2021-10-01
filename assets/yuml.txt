@@ -1,18 +1,17 @@
+[LearningModel]++->[AbstractStrategy]
 [Incentiver]<>-considers>[AbstractStrategy]
-[Dyna_agentPlus]<>-1>[LearningModel]
-[Dyna_agentPlus]<>-1>[Q]
-[StackelbergInstance]<>1-*>[Dyna_agentPlus]
+[DynaAgentPlus]<>-1>[LearningModel]
+[StackelbergInstance]<>1-*>[AbstractAgent]
 
 // Composition
-[AbstractAgent]++->[Dyna_agentPlus]
-[AbstractAgent]++->[TODO: SelfishAgent]
+[AbstractAgent]++->[DynaAgentPlus]
 [AbstractStrategy]++->[StackelbergStrategy]
 [AbstractStrategy]++->[SelfishStrategy]
 [AbstractInstance]++->[StackelbergInstance]
 
 // Classes
-[LearningModel|+model: Array((Edge,AbstractStrategy)
-(Int64,Edge))|LearningModel()]
+[LearningModel|+model: Dict((Edge,AbstractStrategy,Edge)
+(Edge,Float64));+incentiver:Incentiver|LearningModel()]
 
 [Incentiver|+strategy_followed: AbstractStrategy|Incentiver();Incentiver(AbstractStrategy)]
 
@@ -21,15 +20,10 @@
 
 [SelfishStrategy|+strategy: Array(Float64,1)| SelfishStrategy()]
 
-[Q|+q:Array((Edge,AbstractStrategy)
-Float64) Array(Float64,1),1)| Q()]
-
 [<<interface>>;AbstractAgent]
 
-[Dyna_agentPlus|+path:Array(Edge,1) Array(Float64,1);+state:Edge;+actions:Array(Edge,1);+gamma:Float32;+alpha:Float32;+epsilon:Float32;+episodes:Int64;+tau:Int64;+kappa:Float32;+theta:Float32;+queue:PriorityQueue((Edge,AbstractStrategy),AbstractStrategy);+predecessors(Array((Int64,Edge),AbstractStrategy,1));+model:LearningModel;+q:Q;+strategy:AbstractStrategy;+time:Int64| init()]
-
-[TODO: SelfishAgent|+path:Array(Edge,1)]
+[DynaAgentPlus|+path:Array(Edge,1) Array(Float64,1);+state:Edge;+actions:Array(Edge,1);+gamma:Float32;+alpha:Float32;+epsilon:Float32;+episodes:Int64;+tau:Int64;+kappa:Float32;+theta:Float32;+queue:PriorityQueue((Edge,AbstractStrategy),AbstractStrategy);+predecessors(Array((Int64,Edge),AbstractStrategy,1));+strategy:AbstractStrategy;+time:Int64| DynaAgentPlus()]
 
 [<<interface>>;AbstractInstance]
 
-[StackelbergInstance|+network:SimpleWeightedDiGraph;+beta:Float32;+agents:Array(Dyna_agentPlus,1)| StackelbergInstance()]
+[StackelbergInstance|+network:SimpleWeightedDiGraph;+beta:Float32;+agents:Array(DynaAgentPlus,1)| StackelbergInstance()]

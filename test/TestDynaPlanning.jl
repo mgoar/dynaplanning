@@ -11,6 +11,8 @@ using Random
 using Test
 using Logging
 using .Threads
+using Actors
+import Actors: spawn
 
 import .DynaPlanning
 import .DynaUtils
@@ -22,7 +24,7 @@ logger = LogLevel(Logging.Debug)
 ################################################################################
 
 @testset "Constructors" begin
-    @test typeof(DynaPlanning.EnvironmentModel()) == Main.DynaPlanning.EnvironmentModel
+    @test typeof(DynaPlanning.EnvironmentModel()) == Main.DynaPlanning.DictSrv{Actors.Link{Channel{Any}}}
 
     @test typeof(DynaPlanning.Incentiver()) == Main.DynaPlanning.Incentiver
     @test typeof(
